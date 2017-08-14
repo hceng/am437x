@@ -30,21 +30,21 @@ static struct resource leds_resource[] = {
 
     [1] = {  
         .start = 0x44E10000,  
-		.end   = 0x44E1FFFF, 
-		.name  = "CONTROL_MODULE",
-		.flags = IORESOURCE_MEM,//CTRL_CONF_UART3_RXD(A28h)、CTRL_CONF_UART3_TXD(A2Ch)、CTRL_CONF_UART3_CTSN(A30h)、CTRL_CONF_UART3_RTSN((A34h)) CP142、643
+        .end   = 0x44E1FFFF, 
+        .name  = "CONTROL_MODULE",
+        .flags = IORESOURCE_MEM,//CTRL_CONF_UART3_RXD(A28h)、CTRL_CONF_UART3_TXD(A2Ch)、CTRL_CONF_UART3_CTSN(A30h)、CTRL_CONF_UART3_RTSN((A34h)) CP142、643
 	},	
     [2] = { 
-		.start = 0x48322000,  
-		.end   = 0x48322FFF, 
-		.name  = "GOIP5",
-		.flags = IORESOURCE_MEM,//GPIO_OE(134h)、GPIO_SETDATAOUT(194h)、GPIO_DATAOUT(13Ch) CP147、3713
+        .start = 0x48322000,  
+        .end   = 0x48322FFF, 
+        .name  = "GOIP5",
+        .flags = IORESOURCE_MEM,//GPIO_OE(134h)、GPIO_SETDATAOUT(194h)、GPIO_DATAOUT(13Ch) CP147、3713
 	},
     [3] = { 
-		.start = 0,  
-		.end   = 3, 
-		.name  = "GOIP5_PIN",
-		.flags = IORESOURCE_IO,
+        .start = 0,  
+        .end   = 3, 
+        .name  = "GOIP5_PIN",
+        .flags = IORESOURCE_IO,
 	}
 
 };  
@@ -55,7 +55,7 @@ static void leds_release(struct device * dev)
 }
 
 static struct platform_device leds_dev = {
-	.name		   = "ti_am437x_leds_platform",
+    .name		   = "ti_am437x_leds_platform",
     .id       	   = -1,  
     .num_resources = ARRAY_SIZE(leds_resource),  
     .resource      = leds_resource,  
@@ -66,13 +66,13 @@ static struct platform_device leds_dev = {
 
 static int leds_dev_init(void)  
 {  
-	printk(KERN_INFO"leds_dev_init!\n");
+    printk(KERN_INFO"leds_dev_init!\n");
     return platform_device_register(&leds_dev);;  
 }  
   
 static void leds_dev_exit(void)  
 {  
-	printk(KERN_INFO"leds_dev_exit!\n");
+    printk(KERN_INFO"leds_dev_exit!\n");
     platform_device_unregister(&leds_dev);  
 }  
   
