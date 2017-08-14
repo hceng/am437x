@@ -23,7 +23,6 @@
 int major;
 static struct cdev leds_cdev;
 static struct class *leds_cls;
-static struct class *leds_cls;
   
 static volatile unsigned long *PRCM_CM_PER_GPIO5_CLKCTRL = NULL;  
 static volatile unsigned long *CTRL_CONF_UART3_RXD = NULL;  
@@ -164,13 +163,13 @@ struct platform_driver leds_drv = {
 
 static int leds_drv_init(void)  
 {  
-	printk(KERN_INFO"leds_drv_init!\n");
+    printk(KERN_INFO"leds_drv_init!\n");
     return platform_driver_register(&leds_drv);  
 }  
   
 static void leds_drv_exit(void)  
 {  
-	printk(KERN_INFO"leds_drv_exit!\n");
+    printk(KERN_INFO"leds_drv_exit!\n");
     platform_driver_unregister(&leds_drv);  
 }  
 
