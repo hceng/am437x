@@ -80,6 +80,12 @@ static int leds_probe(struct platform_device *pdev)
     dev_t devid;
 	
     printk(KERN_INFO"led_probe!\n");
+
+
+	if (!of_match_device(of_match_ptr(of_gpio_leds_match), dev)) {    
+		printk(KERN_INFO"of_match_device erro!\n");
+        return -EINVAL;  
+    }
 	
     //1.申请设备号
     if(alloc_chrdev_region(&devid, 0, TI_LEDS_CNT, "ti_leds") < 0)
@@ -153,13 +159,22 @@ static int leds_remove(struct platform_device *pdev)
     return 0;  
 }
 
-struct platform_driver leds_drv = {  
-    .probe      = leds_probe,  
-    .remove     = leds_remove,  
-    .driver     = {  
-        .name   = "ti_am437x_leds_platform",  
-    }  
-};  
+
+static const struct of_device_id of_gpio_leds_match[] = {
+	{ .compatible = "gpio-leds", },
+	{},
+};
+
+static struct platform_driver gpio_led_driver = {
+	.probe		= leds_probe,
+	.remove		= leds_remove,
+	.driver		= {
+		.name	= "ti_am437x_leds_platform",//会不会影响
+		.owner	= THIS_MODULE,
+		.of_match_table = of_match_ptr(of_gpio_leds_match),
+	},
+};
+
 
 static int leds_drv_init(void)  
 {  
@@ -180,5 +195,5 @@ module_exit(leds_drv_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("hceng <huangcheng.job@foxmail.com>");
 MODULE_DESCRIPTION("TI am437x board leds drvice");
-MODULE_ALIAS("platform:ti_leds");
-MODULE_VERSION("V2.0");
+MODULE_ALIAS("platform:device tree:ti_leds");
+MODULE_VERSION("V3.0");
