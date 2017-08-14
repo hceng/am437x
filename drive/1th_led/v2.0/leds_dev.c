@@ -55,7 +55,7 @@ static void leds_release(struct device * dev)
 }
 
 static struct platform_device leds_dev = {
-    .name		   = "ti_am437x_leds_platform",
+    .name          = "ti_am437x_leds_platform",
     .id       	   = -1,  
     .num_resources = ARRAY_SIZE(leds_resource),  
     .resource      = leds_resource,  
