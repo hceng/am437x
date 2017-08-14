@@ -90,7 +90,7 @@ static int leds_probe(struct platform_device *pdev)
 	
     major = MAJOR(devid);
 
-	//2.注册到系统中
+    //2.注册到系统中
     cdev_init(&leds_cdev, &leds_fops);        
     cdev_add(&leds_cdev, devid, TI_LEDS_CNT);   
 
@@ -101,21 +101,21 @@ static int leds_probe(struct platform_device *pdev)
     device_create(leds_cls, NULL, MKDEV(major, 2), NULL, "ti_led2"); 
     device_create(leds_cls, NULL, MKDEV(major, 3), NULL, "ti_led3");
 	
-	//3.硬件相关
+    //3.硬件相关
     res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CM_PER");
-	if (!res) 
-		return -EINVAL;	
-    PRCM_CM_PER_GPIO5_CLKCTRL = ioremap(res->start+0x498, 0x04*1);
-	
-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CONTROL_MODULE"); 
     if (!res) 
         return -EINVAL;	
-	CTRL_CONF_UART3_RXD       = ioremap(res->start+0xA28, 0x04*4);
-	CTRL_CONF_UART3_TXD       = CTRL_CONF_UART3_RXD + 1;
-	CTRL_CONF_UART3_CTSN 	  = CTRL_CONF_UART3_RXD + 2;
-	CTRL_CONF_UART3_RTSN	  = CTRL_CONF_UART3_RXD + 3; 
+    PRCM_CM_PER_GPIO5_CLKCTRL = ioremap(res->start+0x498, 0x04*1);
 	
-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "GOIP5"); 
+    res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CONTROL_MODULE"); 
+    if (!res) 
+        return -EINVAL;	
+    CTRL_CONF_UART3_RXD       = ioremap(res->start+0xA28, 0x04*4);
+    CTRL_CONF_UART3_TXD       = CTRL_CONF_UART3_RXD + 1;
+    CTRL_CONF_UART3_CTSN 	  = CTRL_CONF_UART3_RXD + 2;
+    CTRL_CONF_UART3_RTSN	  = CTRL_CONF_UART3_RXD + 3; 
+	
+    res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "GOIP5"); 
     if (!res) 
         return -EINVAL;	
     GPIO_OE                   = ioremap(res->start+0x134, 0x04); 
