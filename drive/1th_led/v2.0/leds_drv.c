@@ -35,30 +35,30 @@ static volatile unsigned long *GPIO_DATAOUT = NULL;
 
 static int leds_drv_open(struct inode *inode, struct file *file)  
 {    
-	int minor = iminor(file->f_inode);
+    int minor = iminor(file->f_inode);
 
-	printk(KERN_INFO"leds_drv_open!\n"); 
+    printk(KERN_INFO"leds_drv_open!\n"); 
 
-	*PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);
+    *PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);
 	
     *CTRL_CONF_UART3_RXD  &= ~(0x7<<0 | 0x01<<16 | 0x01<<17 | 0x01<<18);
-	*CTRL_CONF_UART3_RXD  |=  (0x7<<0 | 0x01<<17);
+    *CTRL_CONF_UART3_RXD  |=  (0x7<<0 | 0x01<<17);
 
-	*GPIO_OE              &= ~(0x01<<minor);
-	*GPIO_SETDATAOUT      |=  (0x01<<minor);
+    *GPIO_OE              &= ~(0x01<<minor);
+    *GPIO_SETDATAOUT      |=  (0x01<<minor);
 	
     return 0;     
 }   
   
 static ssize_t leds_drv_write(struct file *file, const char __user *buf, size_t count, loff_t * ppos)  
 {  
-	int minor = iminor(file->f_inode);
-	int val;  
+    int minor = iminor(file->f_inode);
+    int val;  
 	
-	printk(KERN_INFO"leds_drv_write!\n");
+    printk(KERN_INFO"leds_drv_write!\n");
 	
-	if (copy_from_user(&val, buf, count))
-		return -EFAULT;
+    if (copy_from_user(&val, buf, count))
+        return -EFAULT;
 	
     if (val == 1)  *GPIO_DATAOUT |= (0x01<<minor);    
     else *GPIO_DATAOUT &= ~(0x01<<minor);
@@ -77,12 +77,12 @@ static struct file_operations leds_fops = {
 static int leds_probe(struct platform_device *pdev)  
 {  
     struct resource *res;  
-	dev_t devid;
+    dev_t devid;
 	
-	printk(KERN_INFO"led_probe!\n");
+    printk(KERN_INFO"led_probe!\n");
 	
-	//1.申请设备号
-	if(alloc_chrdev_region(&devid, 0, TI_LEDS_CNT, "ti_leds") < 0)
+    //1.申请设备号
+    if(alloc_chrdev_region(&devid, 0, TI_LEDS_CNT, "ti_leds") < 0)
     {
         printk("%s ERROR\n",__func__);
         goto error;
@@ -91,7 +91,7 @@ static int leds_probe(struct platform_device *pdev)
     major = MAJOR(devid);
 
 	//2.注册到系统中
-	cdev_init(&leds_cdev, &leds_fops);        
+    cdev_init(&leds_cdev, &leds_fops);        
     cdev_add(&leds_cdev, devid, TI_LEDS_CNT);   
 
     leds_cls = class_create(THIS_MODULE, "ti_leds");
@@ -108,47 +108,47 @@ static int leds_probe(struct platform_device *pdev)
     PRCM_CM_PER_GPIO5_CLKCTRL = ioremap(res->start+0x498, 0x04*1);
 	
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CONTROL_MODULE"); 
-	if (!res) 
-		return -EINVAL;	
+    if (!res) 
+        return -EINVAL;	
 	CTRL_CONF_UART3_RXD       = ioremap(res->start+0xA28, 0x04*4);
 	CTRL_CONF_UART3_TXD       = CTRL_CONF_UART3_RXD + 1;
 	CTRL_CONF_UART3_CTSN 	  = CTRL_CONF_UART3_RXD + 2;
 	CTRL_CONF_UART3_RTSN	  = CTRL_CONF_UART3_RXD + 3; 
 	
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "GOIP5"); 
-	if (!res) 
-		return -EINVAL;	
-	GPIO_OE                   = ioremap(res->start+0x134, 0x04); 
-	GPIO_DATAOUT			  = ioremap(res->start+0x13C, 0x04);
-	GPIO_SETDATAOUT           = ioremap(res->start+0x194, 0x04);
+    if (!res) 
+        return -EINVAL;	
+    GPIO_OE                   = ioremap(res->start+0x134, 0x04); 
+    GPIO_DATAOUT			  = ioremap(res->start+0x13C, 0x04);
+    GPIO_SETDATAOUT           = ioremap(res->start+0x194, 0x04);
 	
-	*PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);//使能GPIO外设时钟
+    *PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);//使能GPIO外设时钟
 
 error:
     unregister_chrdev_region(MKDEV(major, 0), TI_LEDS_CNT);	
 
-	return 0;  
+    return 0;  
 }  
   
 static int leds_remove(struct platform_device *pdev)  
 {  
-	unsigned i;
-	printk(KERN_INFO"leds_remove!\n");
+    unsigned i;
+    printk(KERN_INFO"leds_remove!\n");
 
-	for(i=0;i<TI_LEDS_CNT;i++)
-	{
-		device_destroy(leds_cls,  MKDEV(major, i));	
-	}
+    for(i=0;i<TI_LEDS_CNT;i++)
+    {
+        device_destroy(leds_cls,  MKDEV(major, i));	
+    }
 	
-	class_destroy(leds_cls);
-	cdev_del(&leds_cdev);
-	unregister_chrdev(major, "ti_leds"); 
+    class_destroy(leds_cls);
+    cdev_del(&leds_cdev);
+    unregister_chrdev(major, "ti_leds"); 
 	
-	iounmap(PRCM_CM_PER_GPIO5_CLKCTRL);
-	iounmap(CTRL_CONF_UART3_RXD);
-	iounmap(GPIO_OE);
-	iounmap(GPIO_DATAOUT);
-	iounmap(GPIO_SETDATAOUT);
+    iounmap(PRCM_CM_PER_GPIO5_CLKCTRL);
+    iounmap(CTRL_CONF_UART3_RXD);
+    iounmap(GPIO_OE);
+    iounmap(GPIO_DATAOUT);
+    iounmap(GPIO_SETDATAOUT);
 	
     return 0;  
 }
