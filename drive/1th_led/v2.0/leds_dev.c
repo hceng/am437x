@@ -28,19 +28,19 @@ static struct resource leds_resource[] = {
         .flags = IORESOURCE_MEM,//PRCM_CM_PER_GPIO5_CLKCTRL(498h) CP141、469
     },  
 
-	[1] = {  
-		.start = 0x44E10000,  
+    [1] = {  
+        .start = 0x44E10000,  
 		.end   = 0x44E1FFFF, 
 		.name  = "CONTROL_MODULE",
 		.flags = IORESOURCE_MEM,//CTRL_CONF_UART3_RXD(A28h)、CTRL_CONF_UART3_TXD(A2Ch)、CTRL_CONF_UART3_CTSN(A30h)、CTRL_CONF_UART3_RTSN((A34h)) CP142、643
 	},	
-	[2] = { 
+    [2] = { 
 		.start = 0x48322000,  
 		.end   = 0x48322FFF, 
 		.name  = "GOIP5",
 		.flags = IORESOURCE_MEM,//GPIO_OE(134h)、GPIO_SETDATAOUT(194h)、GPIO_DATAOUT(13Ch) CP147、3713
 	},
-	[3] = { 
+    [3] = { 
 		.start = 0,  
 		.end   = 3, 
 		.name  = "GOIP5_PIN",
