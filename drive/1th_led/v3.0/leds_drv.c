@@ -125,7 +125,7 @@ static int leds_probe(struct platform_device *pdev)
     device_create(leds_cls, NULL, MKDEV(major, 2), NULL, "ti_led2"); 
     device_create(leds_cls, NULL, MKDEV(major, 3), NULL, "ti_led3");
 
-	//3.硬件相关
+    //3.硬件相关
     led0 = of_get_named_gpio(dev->of_node, "am437x,led_gpio0", 0);;
     led1 = of_get_named_gpio(dev->of_node, "am437x,led_gpio1", 0);;
     led2 = of_get_named_gpio(dev->of_node, "am437x,led_gpio2", 0);;
