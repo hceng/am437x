@@ -41,7 +41,7 @@ static ssize_t leds_drv_write(struct file *file, const char __user *user_buf, si
 	
     printk(KERN_INFO"%s OK.\n",__func__);
 
-	if(count != 1){
+    if(count != 1){
         printk(KERN_INFO"write count != 1.\n"); 
         return 1;
     }
@@ -100,8 +100,8 @@ static struct file_operations leds_fops = {
 
 static int leds_probe(struct platform_device *pdev)  
 {  
-	struct device *dev = &pdev->dev;
-	dev_t devid;
+    struct device *dev = &pdev->dev;
+    dev_t devid;
 	
     printk(KERN_INFO"%s OK.\n",__func__);
 
@@ -126,20 +126,20 @@ static int leds_probe(struct platform_device *pdev)
     device_create(leds_cls, NULL, MKDEV(major, 3), NULL, "ti_led3");
 
 	//3.硬件相关
-	led0 = of_get_named_gpio(dev->of_node, "am437x,led_gpio0", 0);;
+    led0 = of_get_named_gpio(dev->of_node, "am437x,led_gpio0", 0);;
     led1 = of_get_named_gpio(dev->of_node, "am437x,led_gpio1", 0);;
     led2 = of_get_named_gpio(dev->of_node, "am437x,led_gpio2", 0);;
     led3 = of_get_named_gpio(dev->of_node, "am437x,led_gpio3", 0);
 	
     //printk(KERN_INFO"led0 = %d\n",led0);
- 	//printk(KERN_INFO"led1 = %d\n",led1);
-	//printk(KERN_INFO"led2 = %d\n",led2);
-	//printk(KERN_INFO"led3 = %d\n",led3);
+    //printk(KERN_INFO"led1 = %d\n",led1);
+    //printk(KERN_INFO"led2 = %d\n",led2);
+    //printk(KERN_INFO"led3 = %d\n",led3);
 
-	devm_gpio_request_one(dev, led0, GPIOF_OUT_INIT_HIGH, "LED0");
-	devm_gpio_request_one(dev, led1, GPIOF_OUT_INIT_HIGH, "LED1");
-	devm_gpio_request_one(dev, led2, GPIOF_OUT_INIT_HIGH, "LED2");
-	devm_gpio_request_one(dev, led3, GPIOF_OUT_INIT_HIGH, "LED3");
+    devm_gpio_request_one(dev, led0, GPIOF_OUT_INIT_HIGH, "LED0");
+    devm_gpio_request_one(dev, led1, GPIOF_OUT_INIT_HIGH, "LED1");
+    devm_gpio_request_one(dev, led2, GPIOF_OUT_INIT_HIGH, "LED2");
+    devm_gpio_request_one(dev, led3, GPIOF_OUT_INIT_HIGH, "LED3");
 
 error:
     unregister_chrdev_region(MKDEV(major, 0), TI_LEDS_CNT);	
