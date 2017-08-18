@@ -16,6 +16,8 @@
 #include <asm/io.h> 
 #include <linux/cdev.h>
 #include <asm/uaccess.h>
+#include <linux/gpio.h>
+#include <linux/of_gpio.h>
 
 
 #define TI_LEDS_CNT     4
@@ -23,46 +25,68 @@
 int major;
 static struct cdev leds_cdev;
 static struct class *leds_cls;
-  
-static volatile unsigned long *PRCM_CM_PER_GPIO5_CLKCTRL = NULL;  
-static volatile unsigned long *CTRL_CONF_UART3_RXD = NULL;  
-static volatile unsigned long *CTRL_CONF_UART3_TXD = NULL;  
-static volatile unsigned long *CTRL_CONF_UART3_CTSN = NULL;
-static volatile unsigned long *CTRL_CONF_UART3_RTSN = NULL;
-static volatile unsigned long *GPIO_OE = NULL;
-static volatile unsigned long *GPIO_SETDATAOUT = NULL;
-static volatile unsigned long *GPIO_DATAOUT = NULL;   
-static int led0,led1,led2,led3;
+static int led0,led1,led2,led3; 
 
 static int leds_drv_open(struct inode *inode, struct file *file)  
 {    
-    int minor = iminor(file->f_inode);
+    printk(KERN_INFO"%s OK.\n",__func__); 
 
-    printk(KERN_INFO"leds_drv_open!\n"); 
-
-    *PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);
-	
-    *CTRL_CONF_UART3_RXD  &= ~(0x7<<0 | 0x01<<16 | 0x01<<17 | 0x01<<18);
-    *CTRL_CONF_UART3_RXD  |=  (0x7<<0 | 0x01<<17);
-
-    *GPIO_OE              &= ~(0x01<<minor);
-    *GPIO_SETDATAOUT      |=  (0x01<<minor);
-	
     return 0;     
 }   
   
-static ssize_t leds_drv_write(struct file *file, const char __user *buf, size_t count, loff_t * ppos)  
+static ssize_t leds_drv_write(struct file *file, const char __user *user_buf, size_t count, loff_t * ppos)  
 {  
-    int minor = iminor(file->f_inode);
-    int val;  
+    int minor = iminor(file->f_inode); 
+	char buf;
 	
-    printk(KERN_INFO"leds_drv_write!\n");
-	
-    if (copy_from_user(&val, buf, count))
+    printk(KERN_INFO"%s OK.\n",__func__);
+
+	if(count != 1){
+        printk(KERN_INFO"write count != 1.\n"); 
+        return 1;
+    }
+
+    if (copy_from_user(&buf, user_buf, count))
         return -EFAULT;
 	
-    if (val == 1)  *GPIO_DATAOUT |= (0x01<<minor);    
-    else *GPIO_DATAOUT &= ~(0x01<<minor);
+    if(0x01 == buf)
+    {
+        switch(minor){
+        case 0:
+            gpio_set_value(led0, 0);
+            break;
+        case 1:
+            gpio_set_value(led1, 0);
+            break;
+        case 2:
+            gpio_set_value(led2, 0);
+            break;
+        case 3:
+            gpio_set_value(led3, 0);
+            break;
+        default:
+            printk(KERN_INFO"%s receive minor error.\n",__func__);
+        }                       
+    }
+    else if(0x00 == buf)
+    {
+        switch(minor){
+        case 0:
+            gpio_set_value(led0, 1);
+            break;
+        case 1:
+            gpio_set_value(led1, 1);
+            break;
+        case 2:
+            gpio_set_value(led2, 1);
+            break;
+        case 3:
+            gpio_set_value(led3, 1);
+            break;
+        default:
+            printk(KERN_INFO"%s receive minor error\n",__func__);
+        }       
+    }
 	
     return 0;  
 }  
@@ -74,25 +98,17 @@ static struct file_operations leds_fops = {
     .write  =   leds_drv_write,       
 }; 
 
-
 static int leds_probe(struct platform_device *pdev)  
 {  
-    struct device *dev = &pdev->dev;  
-    dev_t devid;
+	struct device *dev = &pdev->dev;
+	dev_t devid;
 	
-    printk(KERN_INFO"led_probe!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
 
-    led0 = of_get_named_gpio(dev->of_node, "am437x-sk:red:heartbeat", 0);
-    led1 = of_get_named_gpio(dev->of_node, "am437x-sk:green:timer", 0);
-
-    printk(KERN_INFO"led0 = %d\n",led0);
-    printk(KERN_INFO"led1 = %d\n",led0);
-	
-    /*
     //1.申请设备号
     if(alloc_chrdev_region(&devid, 0, TI_LEDS_CNT, "ti_leds") < 0)
     {
-        printk("%s ERROR\n",__func__);
+        printk(KERN_INFO"%s ERROR.\n",__func__);
         goto error;
     }
 	
@@ -108,44 +124,35 @@ static int leds_probe(struct platform_device *pdev)
     device_create(leds_cls, NULL, MKDEV(major, 1), NULL, "ti_led1"); 
     device_create(leds_cls, NULL, MKDEV(major, 2), NULL, "ti_led2"); 
     device_create(leds_cls, NULL, MKDEV(major, 3), NULL, "ti_led3");
+
+	//3.硬件相关
+	led0 = of_get_named_gpio(dev->of_node, "am437x,led_gpio0", 0);;
+    led1 = of_get_named_gpio(dev->of_node, "am437x,led_gpio1", 0);;
+    led2 = of_get_named_gpio(dev->of_node, "am437x,led_gpio2", 0);;
+    led3 = of_get_named_gpio(dev->of_node, "am437x,led_gpio3", 0);
 	
-    //3.硬件相关
-    res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CM_PER");
-    if (!res) 
-        return -EINVAL;	
-    PRCM_CM_PER_GPIO5_CLKCTRL = ioremap(res->start+0x498, 0x04*1);
-	
-    res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CONTROL_MODULE"); 
-    if (!res) 
-        return -EINVAL;	
-    CTRL_CONF_UART3_RXD       = ioremap(res->start+0xA28, 0x04*4);
-    CTRL_CONF_UART3_TXD       = CTRL_CONF_UART3_RXD + 1;
-    CTRL_CONF_UART3_CTSN 	  = CTRL_CONF_UART3_RXD + 2;
-    CTRL_CONF_UART3_RTSN	  = CTRL_CONF_UART3_RXD + 3; 
-	
-    res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "GOIP5"); 
-    if (!res) 
-        return -EINVAL;	
-    GPIO_OE                   = ioremap(res->start+0x134, 0x04); 
-    GPIO_DATAOUT			  = ioremap(res->start+0x13C, 0x04);
-    GPIO_SETDATAOUT           = ioremap(res->start+0x194, 0x04);
-	
-    *PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);//使能GPIO外设时钟
+    //printk(KERN_INFO"led0 = %d\n",led0);
+ 	//printk(KERN_INFO"led1 = %d\n",led1);
+	//printk(KERN_INFO"led2 = %d\n",led2);
+	//printk(KERN_INFO"led3 = %d\n",led3);
+
+	devm_gpio_request_one(dev, led0, GPIOF_OUT_INIT_HIGH, "LED0");
+	devm_gpio_request_one(dev, led1, GPIOF_OUT_INIT_HIGH, "LED1");
+	devm_gpio_request_one(dev, led2, GPIOF_OUT_INIT_HIGH, "LED2");
+	devm_gpio_request_one(dev, led3, GPIOF_OUT_INIT_HIGH, "LED3");
 
 error:
     unregister_chrdev_region(MKDEV(major, 0), TI_LEDS_CNT);	
-
-    */
-    
+	
     return 0;  
 }  
   
 static int leds_remove(struct platform_device *pdev)  
 {  
     unsigned i;
-    printk(KERN_INFO"leds_remove!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
 
-    /*
+    
     for(i=0;i<TI_LEDS_CNT;i++)
     {
         device_destroy(leds_cls,  MKDEV(major, i));	
@@ -155,26 +162,20 @@ static int leds_remove(struct platform_device *pdev)
     cdev_del(&leds_cdev);
     unregister_chrdev(major, "ti_leds"); 
 	
-    iounmap(PRCM_CM_PER_GPIO5_CLKCTRL);
-    iounmap(CTRL_CONF_UART3_RXD);
-    iounmap(GPIO_OE);
-    iounmap(GPIO_DATAOUT);
-    iounmap(GPIO_SETDATAOUT);
-	*/
     return 0;  
 }
 
 
 static const struct of_device_id of_gpio_leds_match[] = {
-	{ .compatible = "ti_leds_gpio", },
+	{ .compatible = "ti_leds", },
 	{},
 };
 
-static struct platform_driver gpio_led_driver = {
+static struct platform_driver leds_drv = {
 	.probe		= leds_probe,
 	.remove		= leds_remove,
 	.driver		= {
-		.name	= "ti_am437x_leds_platform",//会不会影响
+		.name	= "ti_am437x_leds_platform",
 		.owner	= THIS_MODULE,
 		.of_match_table = of_match_ptr(of_gpio_leds_match),
 	},
@@ -183,13 +184,13 @@ static struct platform_driver gpio_led_driver = {
 
 static int leds_drv_init(void)  
 {  
-    printk(KERN_INFO"leds_drv_init!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
     return platform_driver_register(&leds_drv);  
 }  
   
 static void leds_drv_exit(void)  
 {  
-    printk(KERN_INFO"leds_drv_exit!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
     platform_driver_unregister(&leds_drv);  
 }  
 
