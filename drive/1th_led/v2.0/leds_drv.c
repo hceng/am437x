@@ -117,17 +117,17 @@ static int leds_probe(struct platform_device *pdev)
     res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "CONTROL_MODULE"); 
     if (!res) 
         return -EINVAL;	
-    CTRL_CONF_UART3_RXD       = ioremap(res->start+0xA28, 0x04*4);
-    CTRL_CONF_UART3_TXD       = CTRL_CONF_UART3_RXD + 1;
-    CTRL_CONF_UART3_CTSN 	  = CTRL_CONF_UART3_RXD + 2;
-    CTRL_CONF_UART3_RTSN	  = CTRL_CONF_UART3_RXD + 3; 
+    CTRL_CONF_UART3_RXD         = ioremap(res->start+0xA28, 0x04*4);
+    CTRL_CONF_UART3_TXD         = CTRL_CONF_UART3_RXD + 1;
+    CTRL_CONF_UART3_CTSN        = CTRL_CONF_UART3_RXD + 2;
+    CTRL_CONF_UART3_RTSN        = CTRL_CONF_UART3_RXD + 3; 
 
     res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "GOIP5"); 
     if (!res) 
         return -EINVAL;	
-    GPIO_OE                   = ioremap(res->start+0x134, 0x04); 
-    GPIO_DATAOUT			  = ioremap(res->start+0x13C, 0x04);
-    GPIO_SETDATAOUT           = ioremap(res->start+0x194, 0x04);
+    GPIO_OE                     = ioremap(res->start+0x134, 0x04); 
+    GPIO_DATAOUT                = ioremap(res->start+0x13C, 0x04);
+    GPIO_SETDATAOUT             = ioremap(res->start+0x194, 0x04);
 
     *PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);//使能GPIO外设时钟
 

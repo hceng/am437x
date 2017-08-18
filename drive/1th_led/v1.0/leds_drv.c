@@ -66,7 +66,7 @@ static ssize_t leds_drv_write(struct file *file, const char __user *user_buf, si
 static struct file_operations leds_fops = {
     .owner  =   THIS_MODULE,  
     .open   =   leds_drv_open,     
-    .write	=	leds_drv_write,	   
+    .write  =   leds_drv_write,	   
 };
 
 static int leds_drv_init(void)
@@ -100,11 +100,11 @@ static int leds_drv_init(void)
 
     CTRL_CONF_UART3_RXD       = ioremap(0x44E10000+0xA28, 0x04*4);
     CTRL_CONF_UART3_TXD       = CTRL_CONF_UART3_RXD + 1;
-    CTRL_CONF_UART3_CTSN 	  = CTRL_CONF_UART3_RXD + 2;
-    CTRL_CONF_UART3_RTSN	  = CTRL_CONF_UART3_RXD + 3; 
+    CTRL_CONF_UART3_CTSN      = CTRL_CONF_UART3_RXD + 2;
+    CTRL_CONF_UART3_RTSN      = CTRL_CONF_UART3_RXD + 3; 
 
     GPIO_OE                   = ioremap(0x48322000+0x134, 0x04); 
-    GPIO_DATAOUT			  = ioremap(0x48322000+0x13C, 0x04);
+    GPIO_DATAOUT              = ioremap(0x48322000+0x13C, 0x04);
     GPIO_SETDATAOUT           = ioremap(0x48322000+0x194, 0x04);
 
 error:
