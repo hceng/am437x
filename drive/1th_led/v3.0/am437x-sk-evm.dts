@@ -1,0 +1,74 @@
+/* AM437x SK EVM */
+
+/dts-v1/;
+
+#include "am4372.dtsi"
+#include <dt-bindings/pinctrl/am43xx.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "TI AM437x SK EVM";
+	compatible = "ti,am437x-sk-evm","ti,am4372","ti,am43";
+
+	leds {
+		compatible = "ti_leds_gpio";
+
+		/*pinctrl-names = "default";*/
+		pinctrl-0 = <&leds_pins>;
+
+		led@0 {
+			label = "am437x-sk:red:heartbeat";
+			gpios = <&gpio5 0 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 0 */
+			linux,default-trigger = "heartbeat";
+			default-state = "off";
+		};
+
+		led@1 {
+			label = "am437x-sk:green:timer";
+			gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 1 */
+			linux,default-trigger = "timer";
+			default-state = "off";
+		};
+
+		led@2 {
+			label = "am437x-sk:blue:cpu0";
+			gpios = <&gpio5 2 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 2 */
+			linux,default-trigger = "cpu0";
+			default-state = "off";
+		};
+
+		led@3 {
+			label = "am437x-sk:blue:usr3";
+			gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 3 */
+			default-state = "off";
+		};
+	};
+};
+
+&am43xx_pinmux {
+
+	leds_pins: leds_pins {
+		pinctrl-single,pins = <
+			0x228 (PIN_OUTPUT | MUX_MODE7)	/* uart3_rxd.gpio5_2 */
+			0x22c (PIN_OUTPUT | MUX_MODE7)	/* uart3_txd.gpio5_3 */
+			0x230 (PIN_OUTPUT | MUX_MODE7)	/* uart3_ctsn.gpio5_0 */
+			0x234 (PIN_OUTPUT | MUX_MODE7)	/* uart3_rtsn.gpio5_1 */
+		>;
+	};
+
+};
+
+&gpio5 {
+	status = "okay";
+};
+
+&mmc1 {
+	status = "okay";
+};
+
+
+
+
+
+
+

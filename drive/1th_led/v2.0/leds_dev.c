@@ -11,15 +11,15 @@
 
 
 /**************************************************
-                    TI_BOARD
----------------------------------------------------
-Ball     Color       Mode             Pin
----------------------------------------------------
-H24     D7_Blue      0x07     uart3_txd(GPIO5_3)
-H25     D8_Blue      0x07     uart3_rxd(GPIO5_2)
-K24     D9_Green     0x07     uart3_rtsn(GPIO5_1)
-H22     D10_Red      0x07     uart3_ctsn(GPIO5_0)
-**************************************************/
+  TI_BOARD
+  ---------------------------------------------------
+  Ball     Color       Mode             Pin
+  ---------------------------------------------------
+  H24     D7_Blue      0x07     uart3_txd(GPIO5_3)
+  H25     D8_Blue      0x07     uart3_rxd(GPIO5_2)
+  K24     D9_Green     0x07     uart3_rtsn(GPIO5_1)
+  H22     D10_Red      0x07     uart3_ctsn(GPIO5_0)
+ **************************************************/
 static struct resource leds_resource[] = {  
     [0] = {  
         .start = 0x44DF8800,  
@@ -33,25 +33,25 @@ static struct resource leds_resource[] = {
         .end   = 0x44E1FFFF, 
         .name  = "CONTROL_MODULE",
         .flags = IORESOURCE_MEM,//CTRL_CONF_UART3_RXD(A28h)、CTRL_CONF_UART3_TXD(A2Ch)、CTRL_CONF_UART3_CTSN(A30h)、CTRL_CONF_UART3_RTSN((A34h)) CP142、643
-	},	
+    },	
     [2] = { 
         .start = 0x48322000,  
         .end   = 0x48322FFF, 
         .name  = "GOIP5",
         .flags = IORESOURCE_MEM,//GPIO_OE(134h)、GPIO_SETDATAOUT(194h)、GPIO_DATAOUT(13Ch) CP147、3713
-	},
+    },
     [3] = { 
         .start = 0,  
         .end   = 3, 
         .name  = "GOIP5_PIN",
         .flags = IORESOURCE_IO,
-	}
+    }
 
 };  
 
 static void leds_release(struct device * dev)  
 {  
-
+    printk(KERN_INFO"%s OK.\n",__func__);
 }
 
 static struct platform_device leds_dev = {
@@ -60,22 +60,22 @@ static struct platform_device leds_dev = {
     .num_resources = ARRAY_SIZE(leds_resource),  
     .resource      = leds_resource,  
     .dev = {   
-    	.release = leds_release,   
+        .release = leds_release,   
     }, 	   
 };
 
 static int leds_dev_init(void)  
 {  
-    printk(KERN_INFO"leds_dev_init!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
     return platform_device_register(&leds_dev);;  
 }  
-  
+
 static void leds_dev_exit(void)  
 {  
-    printk(KERN_INFO"leds_dev_exit!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
     platform_device_unregister(&leds_dev);  
 }  
-  
+
 
 module_init(leds_dev_init);
 module_exit(leds_dev_exit);

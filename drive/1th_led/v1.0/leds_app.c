@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     //leds off all.
     for(i=0; i<4; i++)
     {
-        write(fd[i], &val, 4);
+        write(fd[i], &val, 1);
     }	
 
     //flicker leds.
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         val = !val;
         for(i=0; i<4; i++)
         {
-            write(fd[i], &val, 4);
+            write(fd[i], &val, 1);
             msleep(300);
         }	
     }

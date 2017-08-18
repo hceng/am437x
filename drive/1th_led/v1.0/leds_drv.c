@@ -27,7 +27,7 @@ static int leds_drv_open(struct inode *inode, struct file *file)
 {    
     int minor = iminor(file->f_inode);
 
-    printk(KERN_INFO"leds_drv_open!\n"); 
+    printk(KERN_INFO"%s OK.\n",__func__);
 
     *PRCM_CM_PER_GPIO5_CLKCTRL  = (0x01<<1);
 
@@ -40,18 +40,25 @@ static int leds_drv_open(struct inode *inode, struct file *file)
     return 0;     
 }   
 
-static ssize_t leds_drv_write(struct file *file, const char __user *buf, size_t count, loff_t * ppos)  
+static ssize_t leds_drv_write(struct file *file, const char __user *user_buf, size_t count, loff_t * ppos)  
 {  
-    int minor = iminor(file->f_inode);
-    int val;  
+    int  minor = iminor(file->f_inode);
+    char buf;  
 
-    printk(KERN_INFO"leds_drv_write!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
 
-    if (copy_from_user(&val, buf, count))
+    if(count != 1){
+        printk(KERN_INFO"write count != 1.\n"); 
+        return 1;
+    }
+
+    if (copy_from_user(&buf, user_buf, count))
         return -EFAULT;
 
-    if (val == 1)  *GPIO_DATAOUT |= (0x01<<minor);    
-    else *GPIO_DATAOUT &= ~(0x01<<minor);
+    if (0x01 == buf)  
+        *GPIO_DATAOUT |=  (0x01<<minor);    
+    else if(0x00 == buf)
+        *GPIO_DATAOUT &= ~(0x01<<minor);
 
     return 0;  
 }  
@@ -67,11 +74,11 @@ static int leds_drv_init(void)
     //1.申请设备号
     dev_t devid;
 
-    printk(KERN_INFO"leds_drv_init!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
 
     if(alloc_chrdev_region(&devid, 0, TI_LEDS_CNT, "ti_leds") < 0)
     {
-        printk("%s ERROR\n",__func__);
+        printk(KERN_INFO"%s ERROR.\n",__func__);
         goto error;
     }
 
@@ -109,7 +116,7 @@ error:
 static void leds_drv_exit(void)
 {
     unsigned i;
-    printk(KERN_INFO"leds_drv_exit!\n");
+    printk(KERN_INFO"%s OK.\n",__func__);
 
     for(i=0;i<TI_LEDS_CNT;i++)
     {

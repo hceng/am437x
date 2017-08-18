@@ -32,6 +32,7 @@ static volatile unsigned long *CTRL_CONF_UART3_RTSN = NULL;
 static volatile unsigned long *GPIO_OE = NULL;
 static volatile unsigned long *GPIO_SETDATAOUT = NULL;
 static volatile unsigned long *GPIO_DATAOUT = NULL;   
+static int led0,led1,led2,led3;
 
 static int leds_drv_open(struct inode *inode, struct file *file)  
 {    
@@ -76,17 +77,18 @@ static struct file_operations leds_fops = {
 
 static int leds_probe(struct platform_device *pdev)  
 {  
-    struct resource *res;  
+    struct device *dev = &pdev->dev;  
     dev_t devid;
 	
     printk(KERN_INFO"led_probe!\n");
 
+    led0 = of_get_named_gpio(dev->of_node, "am437x-sk:red:heartbeat", 0);
+    led1 = of_get_named_gpio(dev->of_node, "am437x-sk:green:timer", 0);
 
-	if (!of_match_device(of_match_ptr(of_gpio_leds_match), dev)) {    
-		printk(KERN_INFO"of_match_device erro!\n");
-        return -EINVAL;  
-    }
+    printk(KERN_INFO"led0 = %d\n",led0);
+    printk(KERN_INFO"led1 = %d\n",led0);
 	
+    /*
     //1.申请设备号
     if(alloc_chrdev_region(&devid, 0, TI_LEDS_CNT, "ti_leds") < 0)
     {
@@ -133,6 +135,8 @@ static int leds_probe(struct platform_device *pdev)
 error:
     unregister_chrdev_region(MKDEV(major, 0), TI_LEDS_CNT);	
 
+    */
+    
     return 0;  
 }  
   
@@ -141,6 +145,7 @@ static int leds_remove(struct platform_device *pdev)
     unsigned i;
     printk(KERN_INFO"leds_remove!\n");
 
+    /*
     for(i=0;i<TI_LEDS_CNT;i++)
     {
         device_destroy(leds_cls,  MKDEV(major, i));	
@@ -155,13 +160,13 @@ static int leds_remove(struct platform_device *pdev)
     iounmap(GPIO_OE);
     iounmap(GPIO_DATAOUT);
     iounmap(GPIO_SETDATAOUT);
-	
+	*/
     return 0;  
 }
 
 
 static const struct of_device_id of_gpio_leds_match[] = {
-	{ .compatible = "gpio-leds", },
+	{ .compatible = "ti_leds_gpio", },
 	{},
 };
 
