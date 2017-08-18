@@ -21,24 +21,27 @@
   H22     D10_Red      0x07     uart3_ctsn(GPIO5_0)
  **************************************************/
 static struct resource leds_resource[] = {  
+//PRCM_CM_PER_GPIO5_CLKCTRL(498h)
     [0] = {  
         .start = 0x44DF8800,  
         .end   = 0x44DFFFFF, 
         .name  = "CM_PER",
-        .flags = IORESOURCE_MEM,//PRCM_CM_PER_GPIO5_CLKCTRL(498h) CP141、469
+        .flags = IORESOURCE_MEM,
     },  
 
+//CTRL_CONF_UART3_RXD(A28h)、CTRL_CONF_UART3_TXD(A2Ch)、CTRL_CONF_UART3_CTSN(A30h)、CTRL_CONF_UART3_RTSN((A34h))
     [1] = {  
         .start = 0x44E10000,  
         .end   = 0x44E1FFFF, 
         .name  = "CONTROL_MODULE",
-        .flags = IORESOURCE_MEM,//CTRL_CONF_UART3_RXD(A28h)、CTRL_CONF_UART3_TXD(A2Ch)、CTRL_CONF_UART3_CTSN(A30h)、CTRL_CONF_UART3_RTSN((A34h)) CP142、643
+        .flags = IORESOURCE_MEM,
     },	
+//GPIO_OE(134h)、GPIO_SETDATAOUT(194h)、GPIO_DATAOUT(13Ch)
     [2] = { 
         .start = 0x48322000,  
         .end   = 0x48322FFF, 
         .name  = "GOIP5",
-        .flags = IORESOURCE_MEM,//GPIO_OE(134h)、GPIO_SETDATAOUT(194h)、GPIO_DATAOUT(13Ch) CP147、3713
+        .flags = IORESOURCE_MEM,
     },
     [3] = { 
         .start = 0,  
