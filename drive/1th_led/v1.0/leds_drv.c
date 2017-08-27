@@ -40,7 +40,7 @@ static int leds_drv_open(struct inode *inode, struct file *file)
     return 0;     
 }   
 
-static ssize_t leds_drv_write(struct file *file, const char __user *user_buf, size_t count, loff_t * ppos)  
+static ssize_t leds_drv_write(struct file *file, const char __user *user_buf, size_t count, loff_t *ppos)  
 {  
     int  minor = iminor(file->f_inode);
     char buf;  
