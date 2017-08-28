@@ -20,12 +20,12 @@ int  main()
 {
     unsigned int i;
 	
-	uart_init();
-	gic_init();
-	timer2_init();
+    uart_init();
+    gic_init();
+    timer2_init();
 	
-	i2c_init();
-	printf("init ok.\n\r");
+    i2c_init();
+    printf("init ok.\n\r");
 
 	//write eeprom.
 	for(i=0; i<5; i++)
