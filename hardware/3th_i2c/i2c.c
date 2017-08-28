@@ -233,65 +233,64 @@ unsigned char eeprom_read(unsigned char addr)
 
 void i2c0_irq(void)
 {
-	unsigned int status = 0;
+    unsigned int status = 0;
 
-	status = I2C0->IRQSTS;
-	I2C0->IRQSTS = (status & (0x01<<3 | 0x01<<4));
+    status = I2C0->IRQSTS;
+    I2C0->IRQSTS = (status & (0x01<<3 | 0x01<<4));
 
-	if(status & (0x01<<3))//receive
+    if(status & (0x01<<3))//receive
     {
-		I2C0->IRQSTS |= (0x01<<3);
+        I2C0->IRQSTS |= (0x01<<3);
 
-		 if(r_count == num)
-         {	
-              I2C0->IRQEN_CLR |= (0x01<<3);
-              I2C0->CON |= (0x01<<1);//stop  
-         } 	 
-		 else
-		 {
-     		  data_from_slave[r_count++] = (unsigned char)I2C0->DATA;
-		 }
-	}
+        if(r_count == num)
+        {	
+            I2C0->IRQEN_CLR |= (0x01<<3);
+            I2C0->CON |= (0x01<<1);//stop  
+        } 	 
+        else
+        {
+            data_from_slave[r_count++] = (unsigned char)I2C0->DATA;
+        }
+    }
 
-	if (status & (0x01<<4))//send
+    if (status & (0x01<<4))//send
     {
-
         I2C0->DATA = data_to_slave[t_count++];
 
-		I2C0->IRQSTS |= (0x01<<4);		 
+        I2C0->IRQSTS |= (0x01<<4);		 
 						
-         if(t_count == num)
-         {
-              I2C0->IRQEN_CLR |= (0x01<<4);
-         }
+        if(t_count == num)
+        {
+            I2C0->IRQEN_CLR |= (0x01<<4);
+        }
     }
 }
 
 void eeprom_write_protect(char x)
 {
-	if(x)
-		GPIO3->DATAOUT |=  (0x01<<7);
-	else 
-		GPIO3->DATAOUT &= ~(0x01<<7);
+    if(x)
+        GPIO3->DATAOUT |=  (0x01<<7);
+    else 
+        GPIO3->DATAOUT &= ~(0x01<<7);
 }
 
 static unsigned int i2c_master_bus_busy(void)
 {
-	if(I2C0->IRQSTS_RAW & (0x01<<12))	
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+    if(I2C0->IRQSTS_RAW & (0x01<<12))	
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 unsigned char eeprom_read(unsigned char addr)
 {
-	unsigned char data = 0;
+    unsigned char data = 0;
 	
-	eeprom_write_protect(0);
+    eeprom_write_protect(0);
 
     data_to_slave[0] = addr>>8;
     data_to_slave[1] = (addr & 0xFF);
@@ -301,162 +300,162 @@ unsigned char eeprom_read(unsigned char addr)
 
     I2C0->CNT = 0x02;
 
-	num = I2C0->CNT;
+    num = I2C0->CNT;
 
-	I2C0->IRQSTS	|=  0x7FFF;
-	I2C0->IRQEN_CLR |=  0x6FFF;
+    I2C0->IRQSTS	|=  0x7FFF;
+    I2C0->IRQEN_CLR |=  0x6FFF;
 
-	I2C0->CON |= (0x01<<9 | 0x01<<10 | 0x01<<15); //MST=1  TRX=1  
+    I2C0->CON |= (0x01<<9 | 0x01<<10 | 0x01<<15); //MST=1  TRX=1  
 
-	I2C0->IRQEN_SET |= (0x01<<4);
+    I2C0->IRQEN_SET |= (0x01<<4);
 	
-	I2C0->CON |= (0x01<<0);
+    I2C0->CON |= (0x01<<0);
 
-	while(i2c_master_bus_busy() == 0);
+    while(i2c_master_bus_busy() == 0);
 	
-	while(t_count != num);
-	while(!(I2C0->IRQSTS_RAW & (0x01<<2)));
+    while(t_count != num);
+    while(!(I2C0->IRQSTS_RAW & (0x01<<2)));
 
 //----------------------------------------------------------------//
 
-	I2C0->CNT = 0x01;
+    I2C0->CNT = 0x01;
 
-	num = I2C0->CNT;
+    num = I2C0->CNT;
 	
-	I2C0->IRQSTS	|=  0x7FFF;
-	I2C0->IRQEN_CLR |=  0x6FFF;
+    I2C0->IRQSTS	|=  0x7FFF;
+    I2C0->IRQEN_CLR |=  0x6FFF;
 
-	I2C0->CON |=  (0x01<<10 | (0x01<<15));	
-	I2C0->CON &= ~(0x01<<9);
+    I2C0->CON |=  (0x01<<10 | (0x01<<15));	
+    I2C0->CON &= ~(0x01<<9);
 	
-	I2C0->IRQEN_SET |= (0x01<<3 | 0x01<<8);
+    I2C0->IRQEN_SET |= (0x01<<3 | 0x01<<8);
 
-	I2C0->CON |= (0x01<<0);
+    I2C0->CON |= (0x01<<0);
 
-	while(i2c_master_bus_busy() == 0);
+    while(i2c_master_bus_busy() == 0);
 
-	while(r_count != num);
+    while(r_count != num);
 
-	data = data_from_slave[0];
+    data = data_from_slave[0];
 
-	eeprom_write_protect(1);
+    eeprom_write_protect(1);
 
-	return data;
+    return data;
 }
 
 
 void eeprom_write(unsigned char addr, unsigned char data)
 {	
-	eeprom_write_protect(0);
+    eeprom_write_protect(0);
 
     data_to_slave[0] = addr>>8;
     data_to_slave[1] = (addr & 0xFF);
-	data_to_slave[2] = data;
+    data_to_slave[2] = data;
 
     t_count = 0;
 
     I2C0->CNT = 0x03;
-	num = I2C0->CNT;
+    num = I2C0->CNT;
 
-	I2C0->IRQSTS	|=  0x7FFF;
-	I2C0->IRQEN_CLR |=  0x7FFF;
+    I2C0->IRQSTS	|=  0x7FFF;
+    I2C0->IRQEN_CLR |=  0x7FFF;
 
-	I2C0->CON |= (0x01<<9 | 0x01<<10 | 0x01<<15); //MST=1  TRX=1  
+    I2C0->CON |= (0x01<<9 | 0x01<<10 | 0x01<<15); //MST=1  TRX=1  
 	
-	I2C0->IRQEN_SET |= (0x01<<4);
+    I2C0->IRQEN_SET |= (0x01<<4);
 	
-	I2C0->CON |= (0x01<<0);
+    I2C0->CON |= (0x01<<0);
     
-	while(i2c_master_bus_busy() == 0);
+    while(i2c_master_bus_busy() == 0);
 
-	while(t_count != num);
+    while(t_count != num);
 	
-	I2C0->CON |= (0x01<<1); //stop
+    I2C0->CON |= (0x01<<1); //stop
 
-	eeprom_write_protect(1);
+    eeprom_write_protect(1);
 }
 
 
 static void i2c_gpio_init(void)
 {
-	PRCM_CM_WKUP_I2C0_CLKCTRL |= (0x02<<0); 
-	PRCM_CM_WKUP_CLKSTCTRL    |= (0x01<<14);
-	PRCM_CM_PER_L4LS_CLKSTCTRL|= (0x01<<27);
+    PRCM_CM_WKUP_I2C0_CLKCTRL |= (0x02<<0); 
+    PRCM_CM_WKUP_CLKSTCTRL    |= (0x01<<14);
+    PRCM_CM_PER_L4LS_CLKSTCTRL|= (0x01<<27);
 
-	PRCM_CM_PER_GPIO3_CLKCTRL  |= (0x02<<0);
+    PRCM_CM_PER_GPIO3_CLKCTRL  |= (0x02<<0);
 	
-	//gpio3_5->I2C0_SDA;gpio3_6->I2C0_SCL;gpio3_7->WP
+    //gpio3_5->I2C0_SDA;gpio3_6->I2C0_SCL;gpio3_7->WP
 
-	CTRL_CONF_I2C0_SDA &= ~(0x07<<0 | 0x01<<16 | 0x01<<19);
-	CTRL_CONF_I2C0_SCL &= ~(0x07<<0 | 0x01<<16 | 0x01<<19);
+    CTRL_CONF_I2C0_SDA &= ~(0x07<<0 | 0x01<<16 | 0x01<<19);
+    CTRL_CONF_I2C0_SCL &= ~(0x07<<0 | 0x01<<16 | 0x01<<19);
     //CTRL_CONF_EMU0
-	GPIO3->OE      &= ~(0x01<<7);
-	GPIO3->DATAOUT |=  (0x01<<7);
+    GPIO3->OE      &= ~(0x01<<7);
+    GPIO3->DATAOUT |=  (0x01<<7);
 }
 
 
 void i2c_init(void)
 {
-	i2c_gpio_init();
-
-	register_irq(IRQ_I2C0, i2c0_irq);
-	
-	interrupt_init(IRQ_I2C0);
-
-	I2C0->CON  &= ~(0x01<<15);//reset
-
-	I2C0->SYSC &= ~(0x01<<0);//Auto Idle disabled.
-
-	I2C0->PSC  = 3;//the module divided by (PSC + 1) -> 48M/(3+1)=12M
-
-	I2C0->SCLL = 63;//tLOW = (SCLL + 7) * ICLK time period
-	I2C0->SCLH = 65;//tHIGH = (SCLH + 5) * ICLK time period
-
-	I2C0->SA = 0x50;//Slave address.1010 000
-
-	I2C0->CON  |=  (0x01<<15);//Module enabled	
+    i2c_gpio_init();
+    
+    register_irq(IRQ_I2C0, i2c0_irq);
+    
+    interrupt_init(IRQ_I2C0);
+    
+    I2C0->CON  &= ~(0x01<<15);//reset
+    
+    I2C0->SYSC &= ~(0x01<<0);//Auto Idle disabled.
+    
+    I2C0->PSC  = 3;//the module divided by (PSC + 1) -> 48M/(3+1)=12M
+    
+    I2C0->SCLL = 63;//tLOW = (SCLL + 7) * ICLK time period
+    I2C0->SCLH = 65;//tHIGH = (SCLH + 5) * ICLK time period
+    
+    I2C0->SA = 0x50;//Slave address.1010 000
+    
+    I2C0->CON  |=  (0x01<<15);//Module enabled	
 }
 
 
 
 void debug_i2c(char *str)
 {
-	_100ask_printf("-------------------------%s---------------------------\r\n",str); 
+    _100ask_printf("-------------------------%s---------------------------\r\n",str); 
     
-	_100ask_printf("I2C0->REVNB_HI    = 0x%x\r\n",I2C0->REVNB_HI    );
-	_100ask_printf("I2C0->REVNB_LO    = 0x%x\r\n",I2C0->REVNB_LO    );
-	_100ask_printf("I2C0->REVNB_HI    = 0x%x\r\n",I2C0->REVNB_HI    );
-	_100ask_printf("I2C0->SYSC        = 0x%x\r\n",I2C0->SYSC        );
-	_100ask_printf("I2C0->IRQSTS_RAW  = 0x%x\r\n",I2C0->IRQSTS_RAW  );
-	_100ask_printf("I2C0->IRQSTS      = 0x%x\r\n",I2C0->IRQSTS      );
-	_100ask_printf("I2C0->IRQEN_SET   = 0x%x\r\n",I2C0->IRQEN_SET   );
-	_100ask_printf("I2C0->IRQEN_CLR   = 0x%x\r\n",I2C0->IRQEN_CLR   );
-	_100ask_printf("I2C0->WE          = 0x%x\r\n",I2C0->WE          );
-	_100ask_printf("I2C0->DMARXEN_SET = 0x%x\r\n",I2C0->DMARXEN_SET );
-	_100ask_printf("I2C0->DMATXEN_SET = 0x%x\r\n",I2C0->DMATXEN_SET );
-	_100ask_printf("I2C0->DMARXEN_CLR = 0x%x\r\n",I2C0->DMARXEN_CLR );
-	_100ask_printf("I2C0->DMATXEN_CLR = 0x%x\r\n",I2C0->DMATXEN_CLR );
-	_100ask_printf("I2C0->DMARXWAKE_EN= 0x%x\r\n",I2C0->DMARXWAKE_EN);
-	_100ask_printf("I2C0->DMATXWAKE_EN= 0x%x\r\n",I2C0->DMATXWAKE_EN);
-	_100ask_printf("I2C0->SYSS        = 0x%x\r\n",I2C0->SYSS        );
-	_100ask_printf("I2C0->BUF         = 0x%x\r\n",I2C0->BUF         );
-	_100ask_printf("I2C0->CNT         = 0x%x\r\n",I2C0->CNT         );
-	_100ask_printf("I2C0->DATA        = 0x%x\r\n",I2C0->DATA        );
-	_100ask_printf("I2C0->CON         = 0x%x\r\n",I2C0->CON         );
-	_100ask_printf("I2C0->OA          = 0x%x\r\n",I2C0->OA          );
-	_100ask_printf("I2C0->SA          = 0x%x\r\n",I2C0->SA          );
-	_100ask_printf("I2C0->PSC         = 0x%x\r\n",I2C0->PSC         );
-	_100ask_printf("I2C0->SCLL        = 0x%x\r\n",I2C0->SCLL        );
-	_100ask_printf("I2C0->SCLH        = 0x%x\r\n",I2C0->SCLH        );
-	_100ask_printf("I2C0->SYSTEST     = 0x%x\r\n",I2C0->SYSTEST     );
-	_100ask_printf("I2C0->BUFSTAT     = 0x%x\r\n",I2C0->BUFSTAT     );
-	_100ask_printf("I2C0->OA1         = 0x%x\r\n",I2C0->OA1         );
-	_100ask_printf("I2C0->OA2         = 0x%x\r\n",I2C0->OA2         );
-	_100ask_printf("I2C0->OA3         = 0x%x\r\n",I2C0->OA3         );
-	_100ask_printf("I2C0->ACTOA       = 0x%x\r\n",I2C0->ACTOA       );
-	_100ask_printf("I2C0->SBLOCK      = 0x%x\r\n",I2C0->SBLOCK      ); 
-
-	_100ask_printf("******************************************************\r\n");
+    _100ask_printf("I2C0->REVNB_HI    = 0x%x\r\n",I2C0->REVNB_HI    );
+    _100ask_printf("I2C0->REVNB_LO    = 0x%x\r\n",I2C0->REVNB_LO    );
+    _100ask_printf("I2C0->REVNB_HI    = 0x%x\r\n",I2C0->REVNB_HI    );
+    _100ask_printf("I2C0->SYSC        = 0x%x\r\n",I2C0->SYSC        );
+    _100ask_printf("I2C0->IRQSTS_RAW  = 0x%x\r\n",I2C0->IRQSTS_RAW  );
+    _100ask_printf("I2C0->IRQSTS      = 0x%x\r\n",I2C0->IRQSTS      );
+    _100ask_printf("I2C0->IRQEN_SET   = 0x%x\r\n",I2C0->IRQEN_SET   );
+    _100ask_printf("I2C0->IRQEN_CLR   = 0x%x\r\n",I2C0->IRQEN_CLR   );
+    _100ask_printf("I2C0->WE          = 0x%x\r\n",I2C0->WE          );
+    _100ask_printf("I2C0->DMARXEN_SET = 0x%x\r\n",I2C0->DMARXEN_SET );
+    _100ask_printf("I2C0->DMATXEN_SET = 0x%x\r\n",I2C0->DMATXEN_SET );
+    _100ask_printf("I2C0->DMARXEN_CLR = 0x%x\r\n",I2C0->DMARXEN_CLR );
+    _100ask_printf("I2C0->DMATXEN_CLR = 0x%x\r\n",I2C0->DMATXEN_CLR );
+    _100ask_printf("I2C0->DMARXWAKE_EN= 0x%x\r\n",I2C0->DMARXWAKE_EN);
+    _100ask_printf("I2C0->DMATXWAKE_EN= 0x%x\r\n",I2C0->DMATXWAKE_EN);
+    _100ask_printf("I2C0->SYSS        = 0x%x\r\n",I2C0->SYSS        );
+    _100ask_printf("I2C0->BUF         = 0x%x\r\n",I2C0->BUF         );
+    _100ask_printf("I2C0->CNT         = 0x%x\r\n",I2C0->CNT         );
+    _100ask_printf("I2C0->DATA        = 0x%x\r\n",I2C0->DATA        );
+    _100ask_printf("I2C0->CON         = 0x%x\r\n",I2C0->CON         );
+    _100ask_printf("I2C0->OA          = 0x%x\r\n",I2C0->OA          );
+    _100ask_printf("I2C0->SA          = 0x%x\r\n",I2C0->SA          );
+    _100ask_printf("I2C0->PSC         = 0x%x\r\n",I2C0->PSC         );
+    _100ask_printf("I2C0->SCLL        = 0x%x\r\n",I2C0->SCLL        );
+    _100ask_printf("I2C0->SCLH        = 0x%x\r\n",I2C0->SCLH        );
+    _100ask_printf("I2C0->SYSTEST     = 0x%x\r\n",I2C0->SYSTEST     );
+    _100ask_printf("I2C0->BUFSTAT     = 0x%x\r\n",I2C0->BUFSTAT     );
+    _100ask_printf("I2C0->OA1         = 0x%x\r\n",I2C0->OA1         );
+    _100ask_printf("I2C0->OA2         = 0x%x\r\n",I2C0->OA2         );
+    _100ask_printf("I2C0->OA3         = 0x%x\r\n",I2C0->OA3         );
+    _100ask_printf("I2C0->ACTOA       = 0x%x\r\n",I2C0->ACTOA       );
+    _100ask_printf("I2C0->SBLOCK      = 0x%x\r\n",I2C0->SBLOCK      ); 
+    
+    _100ask_printf("******************************************************\r\n");
 }
 
 
