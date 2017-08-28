@@ -96,7 +96,7 @@ static int i2c_ack(void)
 
     //实测中，am437x引脚由输出设置为输入的时候，会有一个高电平
     //因此，趁现在SCL为低，先设置为输入
-	GET_SDA();
+    GET_SDA();
 	
     SCL(1);
     i2c_delay(1);
@@ -141,7 +141,7 @@ static unsigned char i2c_read(void)
     SDA(1);
    
     GET_SDA();//同理
-	i2c_delay(1);
+    i2c_delay(1);
 	
     for(i=0; i<8; i++) {
         SCL(1);
@@ -165,9 +165,9 @@ static unsigned char i2c_read(void)
 static void eeprom_write_protect(char x)
 {
 	if(x)
-		GPIO3->DATAOUT |=  (0x01<<7);
+        GPIO3->DATAOUT |=  (0x01<<7);
 	else 
-		GPIO3->DATAOUT &= ~(0x01<<7);
+        GPIO3->DATAOUT &= ~(0x01<<7);
 }
 
 void eeprom_write(unsigned char addr, unsigned char data)
@@ -203,10 +203,10 @@ unsigned char eeprom_read(unsigned char addr)
     i2c_write(0xA0);
     while(i2c_ack());
   
-	i2c_write(addr>>8);
-	while(i2c_ack());
-	i2c_write(addr);
-	while(i2c_ack());
+    i2c_write(addr>>8);
+    while(i2c_ack());
+    i2c_write(addr);
+    while(i2c_ack());
 
     i2c_stop();
     
@@ -215,15 +215,15 @@ unsigned char eeprom_read(unsigned char addr)
     i2c_start();
     
     i2c_write(0xA1);
-   	while(i2c_ack());
+    while(i2c_ack());
 
     data = i2c_read();
     
     i2c_stop();
 	
-	eeprom_write_protect(1);
+    eeprom_write_protect(1);
 
-	return data;
+    return data;
 }
 
 #endif
