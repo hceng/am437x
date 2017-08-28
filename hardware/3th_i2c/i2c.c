@@ -15,31 +15,31 @@ static void i2c_delay(volatile int time)
 
 static void SDA(char x)
 {
-	GPIO3->OE &= ~(0x01<<5);
+    GPIO3->OE &= ~(0x01<<5);
 		
     if(x) {
-		GPIO3->DATAOUT |=  (0x01<<5);
+        GPIO3->DATAOUT |=  (0x01<<5);
     } 
     else {
-		GPIO3->DATAOUT &= ~(0x01<<5);
+        GPIO3->DATAOUT &= ~(0x01<<5);
     }     
 }
 
 static void SCL(char x)
 {
-	GPIO3->OE &= ~(0x01<<6);
+    GPIO3->OE &= ~(0x01<<6);
 
     if(x) {
         GPIO3->DATAOUT |=  (0x01<<6);
     } 
     else {
-		GPIO3->DATAOUT &= ~(0x01<<6);
+        GPIO3->DATAOUT &= ~(0x01<<6);
     }     
 }
 
 static char GET_SDA(void)
 {
-	GPIO3->OE |= (0x01<<5);
+    GPIO3->OE |= (0x01<<5);
 	
     return (GPIO3->DATAIN & (0x01<<5)?1:0);
 }
@@ -51,11 +51,11 @@ void i2c_init(void)
     PRCM_CM_PER_GPIO3_CLKCTRL  |= (0x02<<0);
 
     //gpio3_5->I2C0_SDA;gpio3_6->I2C0_SCL;gpio3_7->WP
-	//CTRL_CONF_I2C0_SDA ;//GPIO模式I2C，默认配置即可
-	//CTRL_CONF_I2C0_SCL ;//GPIO模式I2C，默认配置即可
+    //CTRL_CONF_I2C0_SDA ;//GPIO模式I2C，默认配置即可
+    //CTRL_CONF_I2C0_SCL ;//GPIO模式I2C，默认配置即可
 
-	GPIO3->OE      &= ~(0x01<<7 | 0x01<<6 | 0x01<<5);//输出
-	GPIO3->DATAOUT |=  (0x01<<7 | 0x01<<6 | 0x01<<5);//拉高
+    GPIO3->OE      &= ~(0x01<<7 | 0x01<<6 | 0x01<<5);//输出
+    GPIO3->DATAOUT |=  (0x01<<7 | 0x01<<6 | 0x01<<5);//拉高
 }
 
 static void i2c_start(void)
