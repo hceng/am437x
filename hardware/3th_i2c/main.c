@@ -27,28 +27,28 @@ int  main()
     i2c_init();
     printf("init ok.\n\r");
 
-	//write eeprom.
-	for(i=0; i<5; i++)
-	{
-		eeprom_write(i,2*i);
-		delay_ms(4);//Must be delayed more than 4ms.
-	}
+    //write eeprom.
+    for(i=0; i<5; i++)
+    {
+        eeprom_write(i,2*i);
+        delay_ms(4);//Must be delayed more than 4ms.
+    }
 
-	delay_ms(10);
+    delay_ms(10);
 
-	//read eeprom.
-	for(i=0; i<5; i++)
-	{
-		printf("read_data%d = %d\n\r",i, eeprom_read(i));
-		delay_ms(4);
-	}
+    //read eeprom.
+    for(i=0; i<5; i++)
+    {
+        printf("read_data%d = %d\n\r",i, eeprom_read(i));
+        delay_ms(4);
+    }
 
-	while(1)
-	{
-
-	}
+    while(1)
+    {
+        
+    }
 	
-	return 0;
+    return 0;
 }
 
 
