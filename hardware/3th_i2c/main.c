@@ -25,7 +25,7 @@ int  main()
 	timer2_init();
 	
 	i2c_init();
-	printf("init ok.\n\r");
+	printf("init ok. \n\r");
 
 	//write eeprom.
 	for(i=0; i<5; i++)
