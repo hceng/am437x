@@ -87,17 +87,17 @@ static void i2c_stop(void)
 static int i2c_ack(void)
 {
     int pin_val;
-      
+        
     SCL(0);
     i2c_delay(1);
     
     SDA(1);
     i2c_delay(1);
-
+    
     //实测中，am437x引脚由输出设置为输入的时候，会有一个高电平
     //因此，趁现在SCL为低，先设置为输入
     GET_SDA();
-	
+    
     SCL(1);
     i2c_delay(1);
     
@@ -106,7 +106,7 @@ static int i2c_ack(void)
     
     SCL(0);
     i2c_delay(1);
-   
+    
     return pin_val;
 }
 
@@ -195,19 +195,19 @@ void eeprom_write(unsigned char addr, unsigned char data)
 unsigned char eeprom_read(unsigned char addr)
 {
     unsigned char data = 0;
-	
+    
     eeprom_write_protect(0);
-	
+    
     i2c_start();
     
     i2c_write(0xA0);
     while(i2c_ack());
-  
+    
     i2c_write(addr>>8);
     while(i2c_ack());
     i2c_write(addr);
     while(i2c_ack());
-
+    
     i2c_stop();
     
     i2c_delay(10);
@@ -216,13 +216,13 @@ unsigned char eeprom_read(unsigned char addr)
     
     i2c_write(0xA1);
     while(i2c_ack());
-
+    
     data = i2c_read();
     
     i2c_stop();
-	
+    
     eeprom_write_protect(1);
-
+    
     return data;
 }
 
