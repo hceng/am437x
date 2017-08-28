@@ -421,7 +421,7 @@ void i2c_init(void)
 
 void debug_i2c(char *str)
 {
-	_100ask_printf("-------------------------%s---------------------------\r\n",str);
+	_100ask_printf("-------------------------%s---------------------------\r\n",str); 
     
 	_100ask_printf("I2C0->REVNB_HI    = 0x%x\r\n",I2C0->REVNB_HI    );
 	_100ask_printf("I2C0->REVNB_LO    = 0x%x\r\n",I2C0->REVNB_LO    );
