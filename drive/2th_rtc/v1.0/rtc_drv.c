@@ -49,16 +49,16 @@ static int rtc_drv_open(struct inode *inode, struct file *file)
     printk(KERN_INFO"%s OK.\n",__func__);   
     
     *PRCM_CM_RTC_CLKCTRL   &= ~(0x03<<0);
-	*PRCM_CM_RTC_CLKCTRL   |=  (0x01<<1);
-	*PRCM_CM_RTC_CLKSTCTRL &= ~(0x03<<0);
+    *PRCM_CM_RTC_CLKCTRL   |=  (0x01<<1);
+    *PRCM_CM_RTC_CLKSTCTRL &= ~(0x03<<0);
     
     *RTCSS_CTRL &= ~(0x01<<6);
     
     *RTCSS_KICK0R = (0x83E70B13);
-	*RTCSS_KICK1R = (0x95A4F1E0);
+    *RTCSS_KICK1R = (0x95A4F1E0);
     
     *RTCSS_OSC  &= ~(0x01<<3);
-	*RTCSS_OSC  |=  (0x01<<6);
+    *RTCSS_OSC  |=  (0x01<<6);
     *RTCSS_CTRL |=  (0x01<<0);
     
     return 0;     
@@ -71,11 +71,11 @@ static ssize_t rtc_drv_read_time(struct file *file, char __user *user_buf, size_
     printk(KERN_INFO"%s OK.\n",__func__);  
     
     rtc_time.year   = (((*RTCSS_YEARS   & (0x03<<4))>>4)*10 + (*RTCSS_YEARS   & (0x0F<<0)));
- 	rtc_time.month  = (((*RTCSS_MONTHS  & (0x07<<4))>>4)*10 + (*RTCSS_MONTHS  & (0x0F<<0)));
-	rtc_time.day    = (((*RTCSS_DAYS    & (0x07<<4))>>4)*10 + (*RTCSS_DAYS    & (0x0F<<0)));
-	rtc_time.hour   = (((*RTCSS_HOURS   & (0x03<<4))>>4)*10 + (*RTCSS_HOURS   & (0x0F<<0)));
-	rtc_time.minute = (((*RTCSS_MINUTES & (0x07<<4))>>4)*10 + (*RTCSS_MINUTES & (0x0F<<0)));
-	rtc_time.second = (((*RTCSS_SECONDS & (0x07<<4))>>4)*10 + (*RTCSS_SECONDS & (0x0F<<0)));
+    rtc_time.month  = (((*RTCSS_MONTHS  & (0x07<<4))>>4)*10 + (*RTCSS_MONTHS  & (0x0F<<0)));
+    rtc_time.day    = (((*RTCSS_DAYS    & (0x07<<4))>>4)*10 + (*RTCSS_DAYS    & (0x0F<<0)));
+    rtc_time.hour   = (((*RTCSS_HOURS   & (0x03<<4))>>4)*10 + (*RTCSS_HOURS   & (0x0F<<0)));
+    rtc_time.minute = (((*RTCSS_MINUTES & (0x07<<4))>>4)*10 + (*RTCSS_MINUTES & (0x0F<<0)));
+    rtc_time.second = (((*RTCSS_SECONDS & (0x07<<4))>>4)*10 + (*RTCSS_SECONDS & (0x0F<<0)));
 
     copy_to_user(user_buf, &rtc_time, sizeof(rtc_time)); 
     
@@ -98,29 +98,29 @@ static ssize_t rtc_drv_set_time(struct file *file, const char __user *user_buf, 
     *RTCSS_CTRL &= ~(0x01<<0);//stop
     
     if((rtc_time.year-2000) > 99 || (rtc_time.year-2000) < 0)
-		goto err;
+        goto err;
     
-	if(rtc_time.month > 12 || rtc_time.month < 0)
-		goto err;
-	*RTCSS_MONTHS = ((rtc_time.month/10) << 4) | ((rtc_time.month%10) << 0);
+    if(rtc_time.month > 12 || rtc_time.month < 0)
+        goto err;
+    *RTCSS_MONTHS = ((rtc_time.month/10) << 4) | ((rtc_time.month%10) << 0);
 
-	if(rtc_time.day > 32 || rtc_time.day < 0)
-		goto err;
-	*RTCSS_DAYS = ((rtc_time.day/10) << 4) | ((rtc_time.day%10) << 0);	
+    if(rtc_time.day > 32 || rtc_time.day < 0)
+        goto err;
+    *RTCSS_DAYS = ((rtc_time.day/10) << 4) | ((rtc_time.day%10) << 0);	
 
-	if(rtc_time.hour > 23 || rtc_time.hour < 0)
-		goto err;
-	*RTCSS_HOURS = ((rtc_time.hour/10) << 4) | ((rtc_time.hour%10) << 0);
+    if(rtc_time.hour > 23 || rtc_time.hour < 0)
+        goto err;
+    *RTCSS_HOURS = ((rtc_time.hour/10) << 4) | ((rtc_time.hour%10) << 0);
 
-	if(rtc_time.minute > 59 || rtc_time.minute < 0)
-		goto err;
-	*RTCSS_MINUTES = ((rtc_time.minute/10) << 4) | ((rtc_time.minute%10) << 0);
+    if(rtc_time.minute > 59 || rtc_time.minute < 0)
+        goto err;
+    *RTCSS_MINUTES = ((rtc_time.minute/10) << 4) | ((rtc_time.minute%10) << 0);
 
-	if(rtc_time.second > 59 || rtc_time.second < 0)
-		goto err;
-	*RTCSS_SECONDS = ((rtc_time.second/10) << 4) | ((rtc_time.second%10) << 0);
+    if(rtc_time.second > 59 || rtc_time.second < 0)
+        goto err;
+    *RTCSS_SECONDS = ((rtc_time.second/10) << 4) | ((rtc_time.second%10) << 0);
 
-	*RTCSS_CTRL |= (0x01<<0);//start
+    *RTCSS_CTRL |= (0x01<<0);//start
     
     return 0; 
 
