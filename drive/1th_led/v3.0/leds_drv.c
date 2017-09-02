@@ -149,7 +149,7 @@ error:
   
 static int leds_remove(struct platform_device *pdev)  
 {  
-    unsigned i;
+    unsigned int i;
     printk(KERN_INFO"%s OK.\n",__func__);
 
     
