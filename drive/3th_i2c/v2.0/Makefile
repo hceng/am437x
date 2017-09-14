@@ -7,4 +7,4 @@ clean:
 	make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -C $(KERN_DIR) M=`pwd` modules clean
 	rm -rf modules.order
 
-obj-m	+= at24cxx_dev.o at24cxx_drv.o
+obj-m	+= i2c_bus_am437x.o
